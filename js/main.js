@@ -9,7 +9,10 @@ async function main() {
     };
     const data = await postApi.getAll(queryParams);
     console.log(data);
-  } catch (error) {}
+  } catch (error) {
+    console.log('getAll failed', error);
+    // show modal
+  }
 }
 
 main();

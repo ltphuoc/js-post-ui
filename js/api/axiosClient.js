@@ -34,8 +34,17 @@ axiosClient.interceptors.response.use(
     return response.data;
   },
   function (error) {
+    console.log('axiosClient - response', error.response);
+    if (!error.response) throw new Error('Network error. Please try again');
+
+    // redirect
+    if (error.response.status === 401) {
+      window.location.assign('/post-detail.html');
+      return;
+    }
     // Any status codes that falls outside the range of 2xx cause this function to trigger
     // Do something with response error
+    // throw new Error(error)
     return Promise.reject(error);
   }
 );
