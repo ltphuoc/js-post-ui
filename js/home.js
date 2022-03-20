@@ -2,6 +2,7 @@ import postApi from './api/postApi';
 import { setTextContent, setSrcImg, truncateText, getUlPagination } from './utils/index';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import debounce from 'lodash.debounce';
 
 // to use fromNow()
 dayjs.extend(relativeTime);
@@ -41,7 +42,7 @@ function createPostElement(post) {
 }
 function renderPostList(postList) {
   // console.log({ postList });
-  if (!Array.isArray(postList) || postList.length === 0) return;
+  if (!Array.isArray(postList)) return;
 
   const ulElement = document.getElementById('postList');
   if (!ulElement) return;
@@ -78,6 +79,9 @@ async function handleFilterChange(filterName, filterValue) {
     // update url
     const url = new URL(window.location);
     url.searchParams.set(filterName, filterValue);
+
+    if (filterName === 'title_like') url.searchParams.set('_page', 1);
+
     history.pushState({}, '', url);
 
     // fetch api
@@ -136,9 +140,23 @@ function initURL() {
   history.pushState({}, '', url);
 }
 
+function initSearch() {
+  const searchInput = document.getElementById('searchInput');
+  if (!searchInput) return;
+
+  // set default value from query param
+  const queryParams = new URLSearchParams(window.location.search);
+  if (queryParams.get('title_like')) searchInput.value = queryParams.get('title_like');
+  // title_like
+  const debounceSearch = debounce((e) => handleFilterChange('title_like', e.target.value), 500);
+  searchInput.addEventListener('input', debounceSearch);
+}
+
 (async () => {
   try {
     initPagination();
+    initSearch();
+
     initURL();
 
     const queryParams = new URLSearchParams(window.location.search);

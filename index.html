@@ -166,8 +166,21 @@
         <div class="container">
           <h1 class="with-underline text-center">Latest posts</h1>
 
+          <!-- Search box -->
+          <div class="input-group mb-3">
+            <span class="input-group-text" id="search">Search</span>
+            <input
+              id="searchInput"
+              type="text"
+              class="form-control"
+              placeholder="Search by post title"
+              aria-label="search"
+              aria-describedby="basic-addon1"
+            />
+          </div>
+
           <!-- Post list -->
-          <ul id="postList" class="row posts-list justify-content-center">
+          <ul id="postList" class="row posts-list justify-content-center ps-0">
             <!-- <li class="col-12 col-md-6 col-lg-4">
               <div class="post-item mb-4">
                 <div class="card">
