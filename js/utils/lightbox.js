@@ -9,6 +9,9 @@ export function registerLightbox({ modalId, imageSelector, prevSelector, nextSel
   const modalElement = document.getElementById(modalId);
   if (!modalElement) return;
 
+  // check modal register or not
+  if (Boolean(modalElement.dataset.registered)) return;
+
   // selector
   const imageElement = modalElement.querySelector(imageSelector);
   const prevButton = modalElement.querySelector(prevSelector);
@@ -35,6 +38,16 @@ export function registerLightbox({ modalId, imageSelector, prevSelector, nextSel
     showModal(modalElement);
   });
 
-  prevButton.addEventListener('click', () => {});
-  nextButton.addEventListener('click', () => {});
+  prevButton.addEventListener('click', () => {
+    currentIndex = (currentIndex - 1 + imgList.length) % imgList.length;
+    showImageAtIndex(currentIndex);
+  });
+
+  nextButton.addEventListener('click', () => {
+    currentIndex = (currentIndex + 1) % imgList.length;
+    showImageAtIndex(currentIndex);
+  });
+
+  // mark this modal is already register
+  modalElement.dataset.registered = 'true';
 }
