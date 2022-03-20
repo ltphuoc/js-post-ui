@@ -1,5 +1,5 @@
 import postApi from './api/postApi';
-import { setTextContent, setSrcImg, truncateText } from './utils/index';
+import { setTextContent, setSrcImg, truncateText, getUlPagination } from './utils/index';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 
@@ -46,32 +46,75 @@ function renderPostList(postList) {
   const ulElement = document.getElementById('postList');
   if (!ulElement) return;
 
+  // clear current list
+  ulElement.textContent = '';
+
   postList.forEach((post) => {
     const liElement = createPostElement(post);
     ulElement.appendChild(liElement);
   });
 }
 
-function handleFilterChange(filterName, filterValue) {
-  // update url
-  const url = new URL(window.location);
-  url.searchParams.set(filterName, filterValue);
-  history.pushState({}, '', url);
+function renderPagination(pagination) {
+  const ulPagination = getUlPagination();
+  if (!pagination || !ulPagination) return;
 
-  // fetch api
+  // calc total Pages;
+  const { _page, _limit, _totalRows } = pagination;
+  const totalPages = Math.ceil(_totalRows / _limit);
+  // save page and total page to ulPagination
+  ulPagination.dataset.page = _page;
+  ulPagination.dataset.totalPages = totalPages;
+  // enable / disable
+  if (_page <= 1) ulPagination.firstElementChild?.classList.add('disabled');
+  else ulPagination.firstElementChild?.classList.remove('disabled');
+
+  if (_page >= totalPages) ulPagination.lastElementChild?.classList.add('disabled');
+  else ulPagination.lastElementChild?.classList.remove('disabled');
+}
+
+async function handleFilterChange(filterName, filterValue) {
+  try {
+    // update url
+    const url = new URL(window.location);
+    url.searchParams.set(filterName, filterValue);
+    history.pushState({}, '', url);
+
+    // fetch api
+    const { data, pagination } = await postApi.getAll(url.searchParams);
+    renderPostList(data);
+    renderPagination(pagination);
+  } catch (error) {
+    console.log('failed to get all api', error);
+  }
 }
 
 function handlePrevClick(e) {
   e.preventDefault();
+  const ulPagination = getUlPagination();
+  if (!ulPagination) return;
+
+  const page = Number.parseInt(ulPagination.dataset.page) || 1;
+  if (page <= 1) return;
+
+  handleFilterChange('_page', page - 1);
 }
 
 function handleNextClick(e) {
   e.preventDefault();
+  const ulPagination = getUlPagination();
+  if (!ulPagination) return;
+
+  const page = Number.parseInt(ulPagination.dataset.page) || 1;
+  const totalPages = ulPagination.dataset.totalPages;
+  if (page >= totalPages) return;
+
+  handleFilterChange('_page', page + 1);
 }
 
 function initPagination() {
   // bind click prev and next link
-  const ulPagination = document.getElementById('postsPagination');
+  const ulPagination = getUlPagination();
   if (!ulPagination) return;
 
   const prev = ulPagination.firstElementChild?.firstElementChild;
@@ -101,6 +144,7 @@ function initURL() {
     const queryParams = new URLSearchParams(window.location.search);
     const { data, pagination } = await postApi.getAll(queryParams);
     renderPostList(data);
+    renderPagination(pagination);
   } catch (error) {
     console.log('getAll failed', error);
     // show modal
