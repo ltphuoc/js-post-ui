@@ -35,7 +35,12 @@ export function createPostElement(post) {
   setSrcImg(liElement, '[data-id="thumbnail"]', post.imageUrl);
 
   // attach event (if any)
-
+  // go to post detail when click
+  const divElement = liElement.firstElementChild;
+  if (divElement)
+    divElement.addEventListener('click', () => {
+      window.location.assign(`/post-detail.html?id=${post.id}`);
+    });
   return liElement;
 }
 export function renderPostList(elementId, postList) {
