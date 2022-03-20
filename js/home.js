@@ -52,12 +52,53 @@ function renderPostList(postList) {
   });
 }
 
+function handleFilterChange(filterName, filterValue) {
+  // update url
+  const url = new URL(window.location);
+  url.searchParams.set(filterName, filterValue);
+  history.pushState({}, '', url);
+
+  // fetch api
+}
+
+function handlePrevClick(e) {
+  e.preventDefault();
+}
+
+function handleNextClick(e) {
+  e.preventDefault();
+}
+
+function initPagination() {
+  // bind click prev and next link
+  const ulPagination = document.getElementById('postsPagination');
+  if (!ulPagination) return;
+
+  const prev = ulPagination.firstElementChild?.firstElementChild;
+  if (prev) {
+    prev.addEventListener('click', handlePrevClick);
+  }
+
+  const next = ulPagination.lastElementChild?.lastElementChild;
+  if (next) {
+    next.addEventListener('click', handleNextClick);
+  }
+}
+
+function initURL() {
+  const url = new URL(window.location);
+
+  if (!url.searchParams.get('_page')) url.searchParams.set('_page', 1);
+  if (!url.searchParams.get('_limit')) url.searchParams.set('_limit', 6);
+  history.pushState({}, '', url);
+}
+
 (async () => {
   try {
-    const queryParams = {
-      _page: 1,
-      _limit: 6,
-    };
+    initPagination();
+    initURL();
+
+    const queryParams = new URLSearchParams(window.location.search);
     const { data, pagination } = await postApi.getAll(queryParams);
     renderPostList(data);
   } catch (error) {
