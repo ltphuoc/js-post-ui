@@ -34,3 +34,10 @@ export function truncateText(text, maxLength) {
 
   return `${text.slice(0, maxLength - 1)}…`;
 }
+
+export function setFieldValue(form, selector, value) {
+  if (!form) return;
+
+  const element = form.querySelector(selector);
+  if (element) element.value = value;
+}

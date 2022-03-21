@@ -24,6 +24,7 @@ function renderPostDetail(post) {
     editPageLink.href = `/add-edit-post.html?id=${post.id}`;
     editPageLink.textContent = 'Edit post';
   }
+
 }
 
 (async () => {
@@ -38,9 +39,7 @@ function renderPostDetail(post) {
     const searchParams = new URLSearchParams(window.location.search);
     const postId = searchParams.get('id');
 
-    if (!postId) {
-      return;
-    }
+    if (!postId) return;
 
     const post = await postApi.getById(postId);
     renderPostDetail(post);
