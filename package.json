@@ -13,6 +13,7 @@
   "dependencies": {
     "axios": "^0.26.1",
     "dayjs": "^1.11.0",
-    "lodash.debounce": "^4.0.8"
+    "lodash.debounce": "^4.0.8",
+    "yup": "^0.32.11"
   }
 }

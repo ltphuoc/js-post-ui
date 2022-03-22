@@ -1,4 +1,5 @@
-import { setFieldValue, setHeroImage } from './common';
+import { setFieldValue, setHeroImage, setTextContent } from './common';
+import * as yup from 'yup';
 
 function setFormValue(form, formValue) {
   setFieldValue(form, '[name=title]', formValue?.title);
@@ -28,6 +29,60 @@ function getFormValues(form) {
   return formValues;
 }
 
+function getPostSchema() {
+  return yup.object().shape({
+    title: yup.string().required('Please enter title'),
+    author: yup
+      .string()
+      .required('Please enter author')
+      .test(
+        'at-least-two-words',
+        'PLease enter at least two words',
+        (value) => value.split(' ').filter((x) => !!x && x.length >= 3).length >= 2
+      ),
+    description: yup.string(),
+  });
+}
+
+function setFieldError(form, name, error) {
+  const element = form.querySelector(`[name="${name}"]`);
+  if (element) {
+    element.setCustomValidity(error);
+    setTextContent(element.parentElement, '.invalid-feedback', error);
+  }
+}
+
+async function validateForm(form, formValues) {
+  try {
+    // reset prev error
+    ['title', 'author', 'description'].forEach((name) => setFieldError(form, name, ''));
+
+    const schema = getPostSchema();
+    await schema.validate(formValues, { abortEarly: false });
+  } catch (error) {
+    const errorLog = {};
+
+    if (error.name === 'ValidationError' && Array.isArray(error.inner)) {
+      for (const validationError of error.inner) {
+        const name = validationError.path;
+
+        // ignore if the field is already log
+        if (errorLog[name]) continue;
+
+        // set field error and mark are log
+        setFieldError(form, name, validationError.message);
+        errorLog[name] = true;
+      }
+    }
+  }
+
+  // add was-validated class to form element
+  const isValid = form.checkValidity();
+  if (!isValid) form.classList.add('was-validated');
+
+  return isValid;
+}
+
 export function initPostForm({ formId, defaultValues, onSubmit }) {
   const form = document.getElementById(formId);
   if (!form) return;
@@ -39,10 +94,10 @@ export function initPostForm({ formId, defaultValues, onSubmit }) {
 
     // get formValue
     const formValues = getFormValues(form);
-    console.log(formValues);
 
     // validate
     // if valid submit
     // if not show error
+    if (!validateForm(form, formValues)) return;
   });
 }
