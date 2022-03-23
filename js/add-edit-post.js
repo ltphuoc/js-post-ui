@@ -1,6 +1,22 @@
 import postApi from './api/postApi';
 import { initPostForm } from './utils';
 
+async function handlePostFormSubmit(formValues) {
+  try {
+    // check mode
+    // call API
+
+    const savedPost = formValues.id
+      ? await postApi.update(formValues)
+      : await postApi.add(formValues);
+    // show success
+
+    window.location.assign(`/post-detail.html?id=${savedPost.id}`);
+  } catch (error) {
+    console.log('failed to save post');
+  }
+}
+
 // main
 (async () => {
   try {
@@ -19,9 +35,7 @@ import { initPostForm } from './utils';
     initPostForm({
       formId: 'postForm',
       defaultValues,
-      onSubmit: (formValue) => {
-        console.log(formValue);
-      },
+      onSubmit: handlePostFormSubmit,
     });
   } catch (error) {
     console.log('failed to load getById api', error);
