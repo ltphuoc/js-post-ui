@@ -41,3 +41,10 @@ export function setFieldValue(form, selector, value) {
   const element = form.querySelector(selector);
   if (element) element.value = value;
 }
+
+export function randomNumber(n) {
+  if (n <= 0) return -1;
+
+  const random = Math.random() * n;
+  return Math.round(random);
+}

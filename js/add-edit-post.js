@@ -5,15 +5,17 @@ async function handlePostFormSubmit(formValues) {
   try {
     // check mode
     // call API
-
     const savedPost = formValues.id
       ? await postApi.update(formValues)
       : await postApi.add(formValues);
+
     // show success
     toast.success('Save post successfully');
+
+    // redirect
     setTimeout(() => {
       window.location.assign(`/post-detail.html?id=${savedPost.id}`);
-    }, 3000);
+    }, 2000);
   } catch (error) {
     console.log('failed to save post');
     toast.error(`Error:${error.message}`);
