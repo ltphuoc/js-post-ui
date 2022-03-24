@@ -1,5 +1,6 @@
 # Welcome to POST REPOSITORY
- A web api CRUD vanila javascript to manage post using json server to fake api
+ A web api CRUD vanila javascript to manage post using json server to fake api.
+ Demo: https://blog-js-demo.vercel.app/
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 - This project to practice javascript call api, build tool and library in online course.
@@ -16,9 +17,6 @@
 * Update a post
 * Remove a post
 * Search a post
-
-### Screenshots:
-![Source code of post using JavaScript]()
 
 ### README.md file to demo how to show a description of a repo by default
 
