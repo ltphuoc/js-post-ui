@@ -5,10 +5,10 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 - This project to practice javascript call api, build tool and library in online course.
-- Setup with VietJS.
+- Setup with viteJS.
 - Using dayjs to handle datetime.
 - Using axios to manage api.
-- Using Toastify-js, debounce lodash .
+- Using Toastify-js, debounce lodash.
 - UI: Boostrap.
 
 ### What it can do:
