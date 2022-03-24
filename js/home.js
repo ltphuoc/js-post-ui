@@ -1,12 +1,14 @@
 import postApi from './api/postApi';
-import { initPagination, renderPagination, renderPostList, initSearch } from './utils';
+import { initPagination, renderPagination, renderPostList, initSearch, toast } from './utils';
 
 async function handleFilterChange(filterName, filterValue) {
   try {
     // update url
     const url = new URL(window.location);
-    url.searchParams.set(filterName, filterValue);
 
+    if (filterName) url.searchParams.set(filterName, filterValue);
+
+    // reset pages
     if (filterName === 'title_like') url.searchParams.set('_page', 1);
     history.pushState({}, '', url);
 
@@ -19,6 +21,26 @@ async function handleFilterChange(filterName, filterValue) {
   }
 }
 
+function registerPostDeleteEvent() {
+  document.addEventListener('post-delete', async (event) => {
+    try {
+      const post = event.detail;
+      const message = `Are you sure to remove post "${post.title}"`;
+      if (window.confirm(message)) {
+        await postApi.remove(post.id);
+        await handleFilterChange();
+
+        toast.success('Remove post successfully');
+      }
+    } catch (error) {
+      console.log('failed to remove post', error);
+      toast.error(error.message);
+    }
+    // call API remove
+    // refetch data
+  });
+}
+
 // main
 (async () => {
   try {
@@ -29,6 +51,8 @@ async function handleFilterChange(filterName, filterValue) {
 
     history.pushState({}, '', url);
     const queryParams = url.searchParams;
+
+    registerPostDeleteEvent();
 
     initPagination({
       elementId: 'postsPagination',
@@ -43,9 +67,10 @@ async function handleFilterChange(filterName, filterValue) {
     });
 
     // fetch api
-    const { data, pagination } = await postApi.getAll(queryParams);
-    renderPostList('postList', data);
-    renderPagination('postsPagination', pagination);
+    // const { data, pagination } = await postApi.getAll(queryParams);
+    // renderPostList('postList', data);
+    // renderPagination('postsPagination', pagination);
+    handleFilterChange();
   } catch (error) {
     console.log('getAll failed', error);
   }
