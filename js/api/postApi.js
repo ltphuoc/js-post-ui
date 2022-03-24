@@ -20,17 +20,21 @@ const postApi = {
     const url = `/posts/${data.id}`;
     return axiosClient.patch(url, data);
   },
+  addFormData(data) {
+    const url = '/with-thumbnail/posts';
+    return axiosClient.post(url, data, {
+      headers: {
+        'Content-type': 'multipart/form-data',
+      },
+    });
+  },
   updateFormData(data) {
-    const url = `/posts/${data.id}`;
-    return axiosClient.patch(
-      url,
-      data
-      //   {
-      //   headers: {
-      //     'Content-typeL': 'multipart/form-data',
-      //   },
-      // }
-    );
+    const url = `/with-thumbnail/posts/${data.get('id')}`;
+    return axiosClient.patch(url, data, {
+      headers: {
+        'Content-type': 'multipart/form-data',
+      },
+    });
   },
 
   remove(id) {

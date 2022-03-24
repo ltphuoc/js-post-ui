@@ -10,19 +10,33 @@ function removeUnusedFields(formValues) {
     delete payload.image;
   }
   delete payload.imageSource;
+
+  // remove id if it's add mode
+  if (!payload.id) delete payload.id;
+
   return payload;
 }
 
+function jsonToFormData(jsonObject) {
+  const formData = new FormData();
+
+  for (const key in jsonObject) {
+    formData.set(key, jsonObject[key]);
+  }
+
+  return formData;
+}
+
 async function handlePostFormSubmit(formValues) {
-  const payload = removeUnusedFields(formValues);
-  console.log({ formValues, payload });
-  return;
   try {
+    const payload = removeUnusedFields(formValues);
+    const formData = jsonToFormData(payload);
+
     // check mode
     // call API
     const savedPost = formValues.id
-      ? await postApi.update(formValues)
-      : await postApi.add(formValues);
+      ? await postApi.updateFormData(formData)
+      : await postApi.addFormData(formData);
 
     // show success
     toast.success('Save post successfully');
