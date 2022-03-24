@@ -25,13 +25,39 @@ function registerPostDeleteEvent() {
   document.addEventListener('post-delete', async (event) => {
     try {
       const post = event.detail;
-      const message = `Are you sure to remove post "${post.title}"`;
-      if (window.confirm(message)) {
-        await postApi.remove(post.id);
-        await handleFilterChange();
+      const message = `Are you sure to remove post title: "${post.title}"`;
 
-        toast.success('Remove post successfully');
+      const modal = document.getElementById('exampleModal');
+      if (!modal) return;
+      const modalBody = modal.querySelector('.modal-body');
+      modal.style.display = 'block';
+      modalBody.textContent = message;
+      const yes = document.getElementById('confirmYes');
+      if (yes) {
+        yes.addEventListener('click', async () => {
+          await postApi.remove(post.id);
+          await handleFilterChange();
+          toast.success('Remove post successfully');
+          modal.style.display = 'none';
+        });
       }
+      const no = document.getElementById('confirmNo');
+      if (no) {
+        no.addEventListener('click', () => {
+          modal.style.display = 'none';
+        });
+      }
+
+      if (close) {
+        const close = modal.querySelector('.close');
+        close.addEventListener('click', () => {
+          modal.style.display = 'none';
+        });
+      }
+
+      // if (window.confirm(message)) {
+
+      // }
     } catch (error) {
       console.log('failed to remove post', error);
       toast.error(error.message);
