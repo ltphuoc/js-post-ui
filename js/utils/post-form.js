@@ -1,6 +1,11 @@
 import { randomNumber, setFieldValue, setHeroImage, setTextContent } from './common';
 import * as yup from 'yup';
 
+const ImageSource = {
+  PICSUM: 'picsum',
+  UPLOAD: 'upload',
+};
+
 function setFormValue(form, formValue) {
   setFieldValue(form, '[name=title]', formValue?.title);
   setFieldValue(form, '[name=author]', formValue?.author);
@@ -41,7 +46,25 @@ function getPostSchema() {
         (value) => value.split(' ').filter((x) => !!x && x.length >= 3).length >= 2
       ),
     description: yup.string(),
-    imageUrl: yup.string().required('Please random a bg image').url('Enter valid url'),
+    imageSource: yup
+      .string()
+      .required('Please select image')
+      .oneOf([ImageSource.PICSUM, ImageSource.UPLOAD], 'Invalid image'),
+    imageUrl: yup.string().when('imageSource', {
+      is: ImageSource.PICSUM,
+      then: yup.string().required('Please random a image').url('Please enter valid url'),
+    }),
+    image: yup.mixed().when('imageSource', {
+      is: ImageSource.UPLOAD,
+      then: yup
+        .mixed()
+        .test('required', 'Please select image to upload', (file) => Boolean(file?.name))
+        .test('max-3mb', 'The image is too large (max 3mb)', (file) => {
+          const fileSize = file?.size || 0;
+          const max3mb = 3 * 1024 * 1024; // max 3mb
+          return fileSize < max3mb;
+        }),
+    }),
   });
 }
 
@@ -56,7 +79,7 @@ function setFieldError(form, name, error) {
 async function validateForm(form, formValues) {
   try {
     // reset prev error
-    ['title', 'author', 'description', 'imageUrl'].forEach((name) => setFieldError(form, name, ''));
+    ['title', 'author', 'imageUrl', 'image'].forEach((name) => setFieldError(form, name, ''));
 
     const schema = getPostSchema();
     await schema.validate(formValues, { abortEarly: false });
@@ -112,6 +135,35 @@ function initRandomImage(form) {
   });
 }
 
+function renderImageSourceControl(form, selectedValue) {
+  const controlList = form.querySelectorAll('[data-id="imageSource"]');
+
+  controlList.forEach((control) => {
+    control.hidden = control.dataset.imageSource !== selectedValue;
+  });
+}
+
+function initRadioImageSource(form) {
+  const radioList = form.querySelectorAll('[name="imageSource"]');
+
+  radioList.forEach((radio) => {
+    radio.addEventListener('change', (event) => renderImageSourceControl(form, event.target.value));
+  });
+}
+
+function initUploadImage(form) {
+  const uploadImage = form.querySelector('[name=image]');
+  if (!uploadImage) return;
+
+  uploadImage.addEventListener('change', (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const imageUrl = URL.createObjectURL(file);
+      setHeroImage(document, '#postHeroImage', imageUrl);
+    }
+  });
+}
+
 export function initPostForm({ formId, defaultValues, onSubmit }) {
   const form = document.getElementById(formId);
   if (!form) return;
@@ -122,6 +174,8 @@ export function initPostForm({ formId, defaultValues, onSubmit }) {
 
   // init events
   initRandomImage(form);
+  initRadioImageSource(form);
+  initUploadImage(form);
 
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
