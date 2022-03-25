@@ -11,13 +11,19 @@
 - Using Toastify-js, debounce lodash.
 - UI: Boostrap.
 
-### What it can do:
+## What it can do:
 * Render post 
 * Pagination
 * Add a new post
 * Update a post
 * Remove a post
 * Search a post
+
+## How to run
+`yarn`
+ </br>
+ </br>
+`yarn dev`
 
 ### README.md file to demo how to show a description of a repo by default
 
