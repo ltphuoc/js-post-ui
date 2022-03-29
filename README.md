@@ -20,10 +20,12 @@
 * Search a post
 
 ## How to run
-`yarn`
- </br>
- </br>
-`yarn dev`
+```
+yarn
+```
+```
+yarn dev
+```
 
 ### README.md file to demo how to show a description of a repo by default
 
